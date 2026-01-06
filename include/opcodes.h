@@ -1,0 +1,62 @@
+#pragma once
+#include "adress_modes.h"
+
+class Opcodes {
+    public:
+        void ADC(Adress_modes mode);
+        void AND(Adress_modes mode);
+        void ASL(Adress_modes mode);
+        void BCC();
+        void BCS();
+        void BEQ();
+        void BIT(Adress_modes mode);
+        void BMI();
+        void BNE();
+        void BPL();
+        void BRK();
+        void BVC();
+        void BVS();
+        void CLC();
+        void CLD();
+        void CLI();
+        void CLV();
+        void CMP(Adress_modes mode);
+        void CPX(Adress_modes mode);
+        void CPY(Adress_modes mode);
+        void DEC(Adress_modes mode);
+        void DEX(Adress_modes mode);
+        void DEY(Adress_modes mode);
+        void EOR(Adress_modes mode);
+        void INC(Adress_modes mode);
+        void INX();
+        void INY();
+        void JMP(Adress_modes mode);
+        void JSR();
+        void LDA(Adress_modes mode);
+        void LDX(Adress_modes mode);
+        void LDY(Adress_modes mode);
+        void LSR(Adress_modes mode);
+        void NOP();
+        void ORA(Adress_modes mode);
+        void PHA();
+        void PHP();
+        void PLA();
+        void PLP();
+        void ROL(Adress_modes mode);
+        void ROR(Adress_modes mode);
+        void RTI();
+        void RTS();
+        void SBC(Adress_modes mode);
+        void SEC();
+        void SED();
+        void SEI();
+        void STA(Adress_modes mode);
+        void STX(Adress_modes mode);
+        void STY(Adress_modes mode);
+        void TAX();
+        void TAY();
+        void TSX();
+        void TXA();
+        void TXS();
+        void TYA();
+    };
