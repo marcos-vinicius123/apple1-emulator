@@ -3,9 +3,11 @@
 #include "adress_modes.h"
 #include "status_register.h"
 
+class Rom;
+
 class Mos6502 {
     public:
-        void step(Rom rom);
+        void step(Rom &rom);
         void set_negative(bool value);
         void set_overflow(bool value);
         void set_break(bool value);

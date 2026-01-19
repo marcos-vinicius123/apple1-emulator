@@ -6,7 +6,7 @@ uint8_t Rom::read(uint16_t addr) {
 }
 
 uint16_t Rom::read_address(uint16_t addr) {
-    return (rom[addr+1] << 8) || rom[addr];
+    return (rom[addr+1] << 8) | rom[addr];
 }
 
 void Rom::write(uint16_t addr, uint8_t byte) {
