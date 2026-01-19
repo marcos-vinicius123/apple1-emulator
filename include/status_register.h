@@ -17,7 +17,7 @@ struct StatusRegister {
                (overflow << 6) | (negative << 7);
     }
 
-    static StatusRegister fromByte(uint8_t byte) {
+    static StatusRegister from_byte(uint8_t byte) {
         StatusRegister reg;
         reg.carry = byte & 0x01;
         reg.zero = (byte >> 1) & 0x01;

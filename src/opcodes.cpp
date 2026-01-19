@@ -87,7 +87,8 @@ uint16_t Opcodes::get_adress(Mos6502 &mos6502, Rom &rom, Adress_modes mode) {
             return 0;
     }
 }
-// transfer instructions
+
+//Transfer instructions
 
 //Loads value into the Accumulator
 void Opcodes::LDA(Mos6502 &mos6502, Rom &rom, Adress_modes mode) {
@@ -172,4 +173,29 @@ void Opcodes::TYA(Mos6502 &mos6502, Rom &rom) {
 
     mos6502.set_negative(mos6502.ac>>7);
     mos6502.set_zero(mos6502.ac==0);
+}
+
+//Stack instructions
+
+//Pushes the Accumulator
+void Opcodes::PHA(Mos6502  &mos6502, Rom &rom) {
+    rom.push(mos6502, mos6502.ac);
+}
+
+//Pushes the Status register
+void Opcodes::PHP(Mos6502  &mos6502, Rom &rom) {
+    rom.push(mos6502, mos6502.sr.to_byte());
+}
+
+//Pulls the Accumulator
+void Opcodes::PLA(Mos6502  &mos6502, Rom &rom) {
+    mos6502.ac = rom.pull(mos6502);
+
+    mos6502.set_negative(mos6502.ac>>7);
+    mos6502.set_zero(mos6502.ac==0);
+}
+
+//Pulls the Status register
+void Opcodes::PLP(Mos6502  &mos6502, Rom &rom) {
+    mos6502.sr.from_byte(rom.pull(mos6502));
 }
