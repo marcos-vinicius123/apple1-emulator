@@ -97,7 +97,7 @@ void Opcodes::LDA(Mos6502 &mos6502, Rom &rom, Adress_modes mode) {
     mos6502.set_zero(mos6502.ac==0);
 }
 
-//Loads value into register X
+//Loads value into the X register
 void Opcodes::LDX(Mos6502 &mos6502, Rom &rom, Adress_modes mode) {
     mos6502.x = get_value(mos6502, rom, mode);
 
@@ -105,7 +105,7 @@ void Opcodes::LDX(Mos6502 &mos6502, Rom &rom, Adress_modes mode) {
     mos6502.set_zero(mos6502.x==0);
 }
 
-//Loads value into register Y
+//Loads value into the Y register
 void Opcodes::LDY(Mos6502 &mos6502, Rom &rom, Adress_modes mode) {
     mos6502.y = get_value(mos6502, rom, mode);
 
@@ -127,4 +127,49 @@ void Opcodes::STX(Mos6502 &mos6502, Rom &rom, Adress_modes mode) {
 //Stores the Y register in ROM
 void Opcodes::STY(Mos6502 &mos6502, Rom &rom, Adress_modes mode) {
     rom.write(get_adress(mos6502, rom, mode), mos6502.y);
+}
+
+//Transfers the Accumulator to the X register
+void Opcodes::TAX(Mos6502 &mos6502, Rom &rom) {
+    mos6502.x = mos6502.ac;
+
+    mos6502.set_negative(mos6502.x>>7);
+    mos6502.set_zero(mos6502.x==0);
+}
+
+//Transfers the Accumulator to the Y register
+void Opcodes::TAY(Mos6502 &mos6502, Rom &rom) {
+    mos6502.y = mos6502.ac;
+
+    mos6502.set_negative(mos6502.y>>7);
+    mos6502.set_zero(mos6502.y==0);
+}
+
+//Transfers the Stack Pointer to the X register
+void Opcodes::TSX(Mos6502 &mos6502, Rom &rom) {
+    mos6502.x = mos6502.sp;
+
+    mos6502.set_negative(mos6502.x>>7);
+    mos6502.set_zero(mos6502.x==0);
+}
+
+//Transfers the X register to the Accumulator
+void Opcodes::TXA(Mos6502 &mos6502, Rom &rom) {
+    mos6502.ac = mos6502.x;
+
+    mos6502.set_negative(mos6502.ac>>7);
+    mos6502.set_zero(mos6502.ac==0);
+}
+
+//Transfers the X register to the Stack Pointer
+void Opcodes::TXS(Mos6502 &mos6502, Rom &rom) {
+    mos6502.sp = mos6502.x;
+}
+
+//Transfers the Y register to the Accumulator
+void Opcodes::TYA(Mos6502 &mos6502, Rom &rom) {
+    mos6502.ac = mos6502.y;
+
+    mos6502.set_negative(mos6502.ac>>7);
+    mos6502.set_zero(mos6502.ac==0);
 }

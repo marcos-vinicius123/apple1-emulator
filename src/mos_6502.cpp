@@ -5,6 +5,16 @@
 #include "opcodes.h"
 
 void Mos6502::step(Rom &rom) {
+    uint8_t opcode = rom.read(pc);
+
+    switch (opcode) {
+        case 0x0:
+            /* code */
+            break;
+        
+        default:
+            break;
+    }
 }
 
 void Mos6502::set_negative(bool value) {
