@@ -184,7 +184,9 @@ void Opcodes::PHA(Mos6502  &mos6502, Rom &rom) {
 
 //Pushes the Status register
 void Opcodes::PHP(Mos6502  &mos6502, Rom &rom) {
-    rom.push(mos6502, mos6502.sr.to_byte());
+    uint8_t value = mos6502.sr.to_byte();
+    value |= 0b00110000;
+    rom.push(mos6502, value);
 }
 
 //Pulls the Accumulator
@@ -197,7 +199,7 @@ void Opcodes::PLA(Mos6502  &mos6502, Rom &rom) {
 
 //Pulls the Status register
 void Opcodes::PLP(Mos6502  &mos6502, Rom &rom) {
-    mos6502.sr.from_byte(rom.pull(mos6502));
+    mos6502.sr.from_byte(rom.pull(mos6502)|0x20);
 }
 
 //Decrement and increment instructions
@@ -413,4 +415,48 @@ void Opcodes::SED(Mos6502 &mos6502, Rom &rom) {
 //Sets the interrupt flag
 void Opcodes::SEI(Mos6502 &mos6502, Rom &rom) {
     mos6502.set_interrupt(true);
+}
+
+//Comparisions instructions
+
+//Compare with the Accumulator
+void Opcodes::CMP(Mos6502 &mos6502, Rom &rom, Adress_modes mode) {
+    uint8_t value = get_value(mos6502, rom, mode);
+    uint16_t result = mos6502.ac - value;
+
+    mos6502.set_zero(value==mos6502.ac);
+    mos6502.set_carry(mos6502.ac>=value);
+    mos6502.set_negative(result & 0x80);
+}
+
+//Compare with the X register
+void Opcodes::CPX(Mos6502 &mos6502, Rom &rom, Adress_modes mode) {
+    uint8_t value = get_value(mos6502, rom, mode);
+    uint16_t result = mos6502.x - value;
+
+    mos6502.set_zero(value==mos6502.x);
+    mos6502.set_carry(mos6502.x>=value);
+    mos6502.set_negative(result & 0x80);
+}
+
+//Compare with the Y register
+void Opcodes::CPY(Mos6502 &mos6502, Rom &rom, Adress_modes mode) {
+    uint8_t value = get_value(mos6502, rom, mode);
+    uint16_t result = mos6502.y - value;
+
+    mos6502.set_zero(value==mos6502.y);
+    mos6502.set_carry(mos6502.y>=value);
+    mos6502.set_negative(result & 0x80);
+}
+
+//Bit test instruction
+
+//Bitwise comparasion with the Accumulator
+void Opcodes::BIT(Mos6502 &mos6502, Rom &rom, Adress_modes mode) {
+    uint8_t value = get_value(mos6502, rom, mode);
+    uint8_t result = mos6502.ac & value;
+
+    mos6502.set_zero(result==0);
+    mos6502.set_negative(value>>7);
+    mos6502.set_overflow(value & 0x40);
 }
