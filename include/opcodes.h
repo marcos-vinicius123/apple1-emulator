@@ -27,8 +27,8 @@ class Opcodes {
         void CPX(Mos6502 &mos6502, Rom &rom, Adress_modes mode);
         void CPY(Mos6502 &mos6502, Rom &rom, Adress_modes mode);
         void DEC(Mos6502 &mos6502, Rom &rom, Adress_modes mode);
-        void DEX(Mos6502 &mos6502, Rom &rom, Adress_modes mode);
-        void DEY(Mos6502 &mos6502, Rom &rom, Adress_modes mode);
+        void DEX(Mos6502 &mos6502, Rom &rom);
+        void DEY(Mos6502 &mos6502, Rom &rom);
         void EOR(Mos6502 &mos6502, Rom &rom, Adress_modes mode);
         void INC(Mos6502 &mos6502, Rom &rom, Adress_modes mode);
         void INX(Mos6502 &mos6502, Rom &rom);

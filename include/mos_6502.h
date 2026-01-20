@@ -8,6 +8,7 @@ class Rom;
 class Mos6502 {
     public:
         void step(Rom &rom);
+
         void set_negative(bool value);
         void set_overflow(bool value);
         void set_break(bool value);
@@ -15,6 +16,15 @@ class Mos6502 {
         void set_interrupt(bool value);
         void set_zero(bool value);
         void set_carry(bool value);
+
+        bool get_negative();
+        bool get_overflow();
+        bool get_break();
+        bool get_decimal();
+        bool get_interrupt();
+        bool get_zero();
+        bool get_carry();
+
         uint16_t pc;
         uint8_t ac, x, y, sp;
         StatusRegister sr;

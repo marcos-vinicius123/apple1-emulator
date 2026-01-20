@@ -199,3 +199,107 @@ void Opcodes::PLA(Mos6502  &mos6502, Rom &rom) {
 void Opcodes::PLP(Mos6502  &mos6502, Rom &rom) {
     mos6502.sr.from_byte(rom.pull(mos6502));
 }
+
+//Decrement and increment instructions
+
+//Decrements ROM
+void Opcodes::DEC(Mos6502 &mos6502, Rom &rom, Adress_modes mode) {
+    uint16_t addr = get_adress(mos6502, rom, mode);
+    rom.write(addr, rom.read(addr)-1);
+
+    mos6502.set_negative(rom.read(addr)>>7);
+    mos6502.set_zero(rom.read(addr)==0);
+}
+
+//Decrements the X register
+void Opcodes::DEX(Mos6502 &mos6502,  Rom &rom) {
+    mos6502.x--;
+
+    mos6502.set_negative(mos6502.x>>7);
+    mos6502.set_zero(mos6502.x==0);
+}
+
+//Decrements the Y register
+void Opcodes::DEY(Mos6502 &mos6502, Rom &rom) {
+    mos6502.y--;
+
+    mos6502.set_negative(mos6502.y>>7);
+    mos6502.set_zero(mos6502.y==0);
+}
+
+//Increments ROM
+void Opcodes::INC(Mos6502 &mos6502, Rom &rom, Adress_modes mode) {
+    uint16_t addr = get_adress(mos6502, rom, mode);
+    rom.write(addr, rom.read(addr)+1);
+
+    mos6502.set_negative(rom.read(addr)>>7);
+    mos6502.set_zero(rom.read(addr)==0);
+}
+
+//Increments the X register
+void Opcodes::INX(Mos6502 &mos6502,  Rom &rom) {
+    mos6502.x++;
+
+    mos6502.set_negative(mos6502.x>>7);
+    mos6502.set_zero(mos6502.x==0);
+}
+
+//Increments the Y register
+void Opcodes::INY(Mos6502 &mos6502, Rom &rom) {
+    mos6502.y++;
+
+    mos6502.set_negative(mos6502.y>>7);
+    mos6502.set_zero(mos6502.y==0);
+}
+
+
+//Arithmetic instructions
+
+//TODO: Implement decimal mode support in both the ADC and SBC instructions
+//Add with carry  
+void Opcodes::ADC(Mos6502 &mos6502, Rom &rom, Adress_modes mode) {
+    uint8_t value = get_value(mos6502, rom, mode);
+    uint16_t sum = mos6502.ac + value + mos6502.get_carry();
+    mos6502.set_carry(sum>0xff);
+    mos6502.set_overflow(~(mos6502.ac ^ value) & (mos6502.ac ^ sum) & 0x80);
+    mos6502.ac = sum & 0xff;
+    mos6502.set_zero(mos6502.ac==0);
+    mos6502.set_negative(mos6502.ac>>7);
+}
+
+//Subtract with carry
+void Opcodes::SBC(Mos6502 &mos6502, Rom &rom, Adress_modes mode) {
+    uint8_t value = ~get_value(mos6502, rom, mode);
+    uint16_t sum = mos6502.ac + value + mos6502.get_carry();
+    mos6502.set_carry(sum>0xff);
+    mos6502.set_overflow(~(mos6502.ac ^ value) & (mos6502.ac ^ sum) & 0x80);
+    mos6502.ac = sum & 0xff;
+    mos6502.set_zero(mos6502.ac==0);
+    mos6502.set_negative(mos6502.ac>>7);
+}
+
+//Logical operations instructions
+
+//Binary and with the Accumulator
+void Opcodes::AND(Mos6502 &mos6502, Rom &rom, Adress_modes mode) {
+    mos6502.ac &= get_value(mos6502, rom, mode);
+
+    mos6502.set_negative(mos6502.ac>>7);
+    mos6502.set_zero(mos6502.ac==0);
+}
+
+//Binary exclusive or with the Accumulator
+void Opcodes::EOR(Mos6502 &mos6502, Rom &rom, Adress_modes mode) {
+    mos6502.ac ^= get_value(mos6502, rom, mode);
+
+    mos6502.set_negative(mos6502.ac>>7);
+    mos6502.set_zero(mos6502.ac==0);
+}
+
+//Binary or with the Accumulator
+void Opcodes::ORA(Mos6502 &mos6502, Rom &rom, Adress_modes mode) {
+    mos6502.ac |= get_value(mos6502, rom, mode);
+
+    mos6502.set_negative(mos6502.ac>>7);
+    mos6502.set_zero(mos6502.ac==0);
+}
