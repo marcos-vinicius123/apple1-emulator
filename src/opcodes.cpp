@@ -349,6 +349,12 @@ void Opcodes::ROL(Mos6502 &mos6502, Rom &rom, Adress_modes mode) {
 
     mos6502.set_negative(value>>7);
     mos6502.set_zero(value==0);
+
+    if (mode==Adress_modes::accumulator) {
+        mos6502.ac = value;
+    } else {
+        rom.write(get_adress(mos6502, rom, mode), value);
+    }
 }
 
 //Rotate right
@@ -358,8 +364,53 @@ void Opcodes::ROR(Mos6502 &mos6502, Rom &rom, Adress_modes mode) {
 
     mos6502.set_carry(value&0x1);
     value >>= 1;
-    value |= old_carry<<7;
+    value |= (uint8_t)old_carry<<7;
 
     mos6502.set_negative(value>>7);
     mos6502.set_zero(value==0);
+
+    if (mode==Adress_modes::accumulator) {
+        mos6502.ac = value;
+    } else {
+        rom.write(get_adress(mos6502, rom, mode), value);
+    }
+}
+
+//Flag instructions
+
+//Clears the carry flag
+void Opcodes::CLC(Mos6502 &mos6502, Rom &rom) {
+    mos6502.set_carry(false);
+}
+
+//Clears the decimal flag
+void Opcodes::CLD(Mos6502 &mos6502, Rom &rom) {
+    mos6502.set_decimal(false);
+}
+
+//TODO:implement delay
+//Clears the interrupt flag
+void Opcodes::CLI(Mos6502 &mos6502, Rom &rom) {
+    mos6502.set_interrupt(false);
+}
+
+//Clears the overflow flag
+void Opcodes::CLV(Mos6502 &mos6502, Rom &rom) {
+    mos6502.set_overflow(false);
+}
+
+//Sets the carry flag
+void Opcodes::SEC(Mos6502 &mos6502, Rom &rom) {
+    mos6502.set_carry(true);
+}
+
+//Sets the decimal flag
+void Opcodes::SED(Mos6502 &mos6502, Rom &rom) {
+    mos6502.set_decimal(true);
+}
+
+//TODO:implement delay
+//Sets the interrupt flag
+void Opcodes::SEI(Mos6502 &mos6502, Rom &rom) {
+    mos6502.set_interrupt(true);
 }
