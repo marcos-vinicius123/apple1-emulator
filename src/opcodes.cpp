@@ -303,3 +303,63 @@ void Opcodes::ORA(Mos6502 &mos6502, Rom &rom, Adress_modes mode) {
     mos6502.set_negative(mos6502.ac>>7);
     mos6502.set_zero(mos6502.ac==0);
 }
+
+//Shift and rotate instructions
+
+//Arithmetic shift left
+void Opcodes::ASL(Mos6502 &mos6502, Rom &rom, Adress_modes mode) {
+    uint8_t value = mode==Adress_modes::accumulator ? mos6502.ac : get_value(mos6502, rom, mode);
+    
+    mos6502.set_carry(value >> 7);
+    value <<= 1;
+    mos6502.set_negative(value >> 7);
+    mos6502.set_zero(value==0);
+
+    if (mode==Adress_modes::accumulator) {
+        mos6502.ac = value;
+    } else {
+        rom.write(get_adress(mos6502, rom, mode), value);
+    }
+}
+
+//Logical shift right
+void Opcodes::LSR(Mos6502 &mos6502, Rom &rom, Adress_modes mode) {
+    uint8_t value = mode==Adress_modes::accumulator ? mos6502.ac : get_value(mos6502, rom, mode);
+    
+    mos6502.set_carry(value & 0x1);
+    value >>= 1;
+    mos6502.set_negative(false);
+    mos6502.set_zero(value==0);
+
+    if (mode==Adress_modes::accumulator) {
+        mos6502.ac = value;
+    } else {
+        rom.write(get_adress(mos6502, rom, mode), value);
+    }
+}
+
+//Rotate left
+void Opcodes::ROL(Mos6502 &mos6502, Rom &rom, Adress_modes mode) {
+    uint8_t value = mode==Adress_modes::accumulator ? mos6502.ac : get_value(mos6502, rom, mode);
+    bool old_carry = mos6502.get_carry();
+
+    mos6502.set_carry(value>>7);
+    value <<= 1;
+    value |= old_carry;
+
+    mos6502.set_negative(value>>7);
+    mos6502.set_zero(value==0);
+}
+
+//Rotate right
+void Opcodes::ROR(Mos6502 &mos6502, Rom &rom, Adress_modes mode) {
+    uint8_t value = mode==Adress_modes::accumulator ? mos6502.ac : get_value(mos6502, rom, mode);
+    bool old_carry = mos6502.get_carry();
+
+    mos6502.set_carry(value&0x1);
+    value >>= 1;
+    value |= old_carry<<7;
+
+    mos6502.set_negative(value>>7);
+    mos6502.set_zero(value==0);
+}
