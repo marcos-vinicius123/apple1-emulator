@@ -4,6 +4,7 @@
 #include "status_register.h"
 
 class Rom;
+class Opcodes;
 
 class Mos6502 {
     public:
@@ -31,4 +32,5 @@ class Mos6502 {
         uint16_t pc;
         uint8_t ac, x, y, sp;
         StatusRegister sr;
+        // Opcodes opcodes;
 };

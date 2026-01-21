@@ -96,6 +96,8 @@ void Opcodes::LDA(Mos6502 &mos6502, Rom &rom, Adress_modes mode) {
 
     mos6502.set_negative(mos6502.ac>>7);
     mos6502.set_zero(mos6502.ac==0);
+
+    mos6502.pc += addr_mode_to_bytes(mode);
 }
 
 //Loads value into the X register
@@ -104,6 +106,8 @@ void Opcodes::LDX(Mos6502 &mos6502, Rom &rom, Adress_modes mode) {
 
     mos6502.set_negative(mos6502.x>>7);
     mos6502.set_zero(mos6502.x==0);
+
+    mos6502.pc += addr_mode_to_bytes(mode);
 }
 
 //Loads value into the Y register
@@ -112,22 +116,29 @@ void Opcodes::LDY(Mos6502 &mos6502, Rom &rom, Adress_modes mode) {
 
     mos6502.set_negative(mos6502.y>>7);
     mos6502.set_zero(mos6502.y==0);
+
+    mos6502.pc += addr_mode_to_bytes(mode);
 }
 
 //Stores the Accumulator in ROM
 void Opcodes::STA(Mos6502 &mos6502, Rom &rom, Adress_modes mode)  {
     rom.write(get_adress(mos6502, rom, mode), mos6502.ac);
+
+    mos6502.pc += addr_mode_to_bytes(mode);
 }
 
 //Stores the X register in ROM
 void Opcodes::STX(Mos6502 &mos6502, Rom &rom, Adress_modes mode) {
    rom.write(get_adress(mos6502, rom, mode), mos6502.x);
-    
+
+   mos6502.pc += addr_mode_to_bytes(mode);
 }
 
 //Stores the Y register in ROM
 void Opcodes::STY(Mos6502 &mos6502, Rom &rom, Adress_modes mode) {
     rom.write(get_adress(mos6502, rom, mode), mos6502.y);
+
+    mos6502.pc += addr_mode_to_bytes(mode);
 }
 
 //Transfers the Accumulator to the X register
@@ -136,6 +147,8 @@ void Opcodes::TAX(Mos6502 &mos6502, Rom &rom) {
 
     mos6502.set_negative(mos6502.x>>7);
     mos6502.set_zero(mos6502.x==0);
+
+    mos6502.pc += addr_mode_to_bytes(Adress_modes::implied);
 }
 
 //Transfers the Accumulator to the Y register
@@ -144,6 +157,8 @@ void Opcodes::TAY(Mos6502 &mos6502, Rom &rom) {
 
     mos6502.set_negative(mos6502.y>>7);
     mos6502.set_zero(mos6502.y==0);
+
+    mos6502.pc += addr_mode_to_bytes(Adress_modes::implied);
 }
 
 //Transfers the Stack Pointer to the X register
@@ -152,6 +167,8 @@ void Opcodes::TSX(Mos6502 &mos6502, Rom &rom) {
 
     mos6502.set_negative(mos6502.x>>7);
     mos6502.set_zero(mos6502.x==0);
+
+    mos6502.pc += addr_mode_to_bytes(Adress_modes::implied);
 }
 
 //Transfers the X register to the Accumulator
@@ -160,11 +177,15 @@ void Opcodes::TXA(Mos6502 &mos6502, Rom &rom) {
 
     mos6502.set_negative(mos6502.ac>>7);
     mos6502.set_zero(mos6502.ac==0);
+
+    mos6502.pc += addr_mode_to_bytes(Adress_modes::implied);
 }
 
 //Transfers the X register to the Stack Pointer
 void Opcodes::TXS(Mos6502 &mos6502, Rom &rom) {
     mos6502.sp = mos6502.x;
+
+    mos6502.pc += addr_mode_to_bytes(Adress_modes::implied);
 }
 
 //Transfers the Y register to the Accumulator
@@ -173,6 +194,8 @@ void Opcodes::TYA(Mos6502 &mos6502, Rom &rom) {
 
     mos6502.set_negative(mos6502.ac>>7);
     mos6502.set_zero(mos6502.ac==0);
+
+    mos6502.pc += addr_mode_to_bytes(Adress_modes::implied);
 }
 
 //Stack instructions
@@ -180,6 +203,8 @@ void Opcodes::TYA(Mos6502 &mos6502, Rom &rom) {
 //Pushes the Accumulator
 void Opcodes::PHA(Mos6502  &mos6502, Rom &rom) {
     rom.push(mos6502, mos6502.ac);
+
+    mos6502.pc += addr_mode_to_bytes(Adress_modes::implied);
 }
 
 //Pushes the Status register
@@ -187,6 +212,8 @@ void Opcodes::PHP(Mos6502  &mos6502, Rom &rom) {
     uint8_t value = mos6502.sr.to_byte();
     value |= 0b00110000;
     rom.push(mos6502, value);
+
+    mos6502.pc += addr_mode_to_bytes(Adress_modes::implied);
 }
 
 //Pulls the Accumulator
@@ -195,11 +222,15 @@ void Opcodes::PLA(Mos6502  &mos6502, Rom &rom) {
 
     mos6502.set_negative(mos6502.ac>>7);
     mos6502.set_zero(mos6502.ac==0);
+
+    mos6502.pc += addr_mode_to_bytes(Adress_modes::implied);
 }
 
 //Pulls the Status register
 void Opcodes::PLP(Mos6502  &mos6502, Rom &rom) {
     mos6502.sr.from_byte(rom.pull(mos6502)|0x20);
+
+    mos6502.pc += addr_mode_to_bytes(Adress_modes::implied);
 }
 
 //Decrement and increment instructions
@@ -211,6 +242,8 @@ void Opcodes::DEC(Mos6502 &mos6502, Rom &rom, Adress_modes mode) {
 
     mos6502.set_negative(rom.read(addr)>>7);
     mos6502.set_zero(rom.read(addr)==0);
+
+    mos6502.pc += addr_mode_to_bytes(mode);
 }
 
 //Decrements the X register
@@ -219,6 +252,8 @@ void Opcodes::DEX(Mos6502 &mos6502,  Rom &rom) {
 
     mos6502.set_negative(mos6502.x>>7);
     mos6502.set_zero(mos6502.x==0);
+
+    mos6502.pc += addr_mode_to_bytes(Adress_modes::implied);
 }
 
 //Decrements the Y register
@@ -227,6 +262,8 @@ void Opcodes::DEY(Mos6502 &mos6502, Rom &rom) {
 
     mos6502.set_negative(mos6502.y>>7);
     mos6502.set_zero(mos6502.y==0);
+
+    mos6502.pc += addr_mode_to_bytes(Adress_modes::implied);
 }
 
 //Increments ROM
@@ -236,6 +273,8 @@ void Opcodes::INC(Mos6502 &mos6502, Rom &rom, Adress_modes mode) {
 
     mos6502.set_negative(rom.read(addr)>>7);
     mos6502.set_zero(rom.read(addr)==0);
+
+    mos6502.pc += addr_mode_to_bytes(mode);
 }
 
 //Increments the X register
@@ -244,6 +283,8 @@ void Opcodes::INX(Mos6502 &mos6502,  Rom &rom) {
 
     mos6502.set_negative(mos6502.x>>7);
     mos6502.set_zero(mos6502.x==0);
+
+    mos6502.pc += addr_mode_to_bytes(Adress_modes::implied);
 }
 
 //Increments the Y register
@@ -252,6 +293,8 @@ void Opcodes::INY(Mos6502 &mos6502, Rom &rom) {
 
     mos6502.set_negative(mos6502.y>>7);
     mos6502.set_zero(mos6502.y==0);
+
+    mos6502.pc += addr_mode_to_bytes(Adress_modes::implied);
 }
 
 
@@ -267,6 +310,8 @@ void Opcodes::ADC(Mos6502 &mos6502, Rom &rom, Adress_modes mode) {
     mos6502.ac = sum & 0xff;
     mos6502.set_zero(mos6502.ac==0);
     mos6502.set_negative(mos6502.ac>>7);
+
+    mos6502.pc += addr_mode_to_bytes(mode);
 }
 
 //Subtract with carry
@@ -278,6 +323,8 @@ void Opcodes::SBC(Mos6502 &mos6502, Rom &rom, Adress_modes mode) {
     mos6502.ac = sum & 0xff;
     mos6502.set_zero(mos6502.ac==0);
     mos6502.set_negative(mos6502.ac>>7);
+
+    mos6502.pc += addr_mode_to_bytes(mode);
 }
 
 //Logical operations instructions
@@ -288,6 +335,8 @@ void Opcodes::AND(Mos6502 &mos6502, Rom &rom, Adress_modes mode) {
 
     mos6502.set_negative(mos6502.ac>>7);
     mos6502.set_zero(mos6502.ac==0);
+
+    mos6502.pc += addr_mode_to_bytes(mode);
 }
 
 //Binary exclusive or with the Accumulator
@@ -296,6 +345,8 @@ void Opcodes::EOR(Mos6502 &mos6502, Rom &rom, Adress_modes mode) {
 
     mos6502.set_negative(mos6502.ac>>7);
     mos6502.set_zero(mos6502.ac==0);
+
+    mos6502.pc += addr_mode_to_bytes(mode);
 }
 
 //Binary or with the Accumulator
@@ -304,6 +355,8 @@ void Opcodes::ORA(Mos6502 &mos6502, Rom &rom, Adress_modes mode) {
 
     mos6502.set_negative(mos6502.ac>>7);
     mos6502.set_zero(mos6502.ac==0);
+
+    mos6502.pc += addr_mode_to_bytes(mode);
 }
 
 //Shift and rotate instructions
@@ -322,6 +375,8 @@ void Opcodes::ASL(Mos6502 &mos6502, Rom &rom, Adress_modes mode) {
     } else {
         rom.write(get_adress(mos6502, rom, mode), value);
     }
+
+    mos6502.pc += addr_mode_to_bytes(mode);
 }
 
 //Logical shift right
@@ -338,6 +393,8 @@ void Opcodes::LSR(Mos6502 &mos6502, Rom &rom, Adress_modes mode) {
     } else {
         rom.write(get_adress(mos6502, rom, mode), value);
     }
+
+    mos6502.pc += addr_mode_to_bytes(mode);
 }
 
 //Rotate left
@@ -357,6 +414,8 @@ void Opcodes::ROL(Mos6502 &mos6502, Rom &rom, Adress_modes mode) {
     } else {
         rom.write(get_adress(mos6502, rom, mode), value);
     }
+
+    mos6502.pc += addr_mode_to_bytes(mode);
 }
 
 //Rotate right
@@ -376,6 +435,8 @@ void Opcodes::ROR(Mos6502 &mos6502, Rom &rom, Adress_modes mode) {
     } else {
         rom.write(get_adress(mos6502, rom, mode), value);
     }
+
+    mos6502.pc += addr_mode_to_bytes(mode);
 }
 
 //Flag instructions
@@ -383,38 +444,52 @@ void Opcodes::ROR(Mos6502 &mos6502, Rom &rom, Adress_modes mode) {
 //Clears the carry flag
 void Opcodes::CLC(Mos6502 &mos6502, Rom &rom) {
     mos6502.set_carry(false);
+
+    mos6502.pc += addr_mode_to_bytes(Adress_modes::implied);
 }
 
 //Clears the decimal flag
 void Opcodes::CLD(Mos6502 &mos6502, Rom &rom) {
     mos6502.set_decimal(false);
+
+    mos6502.pc += addr_mode_to_bytes(Adress_modes::implied);
 }
 
 //TODO:implement delay
 //Clears the interrupt flag
 void Opcodes::CLI(Mos6502 &mos6502, Rom &rom) {
     mos6502.set_interrupt(false);
+
+    mos6502.pc += addr_mode_to_bytes(Adress_modes::implied);
 }
 
 //Clears the overflow flag
 void Opcodes::CLV(Mos6502 &mos6502, Rom &rom) {
     mos6502.set_overflow(false);
+
+    mos6502.pc += addr_mode_to_bytes(Adress_modes::implied);
 }
 
 //Sets the carry flag
 void Opcodes::SEC(Mos6502 &mos6502, Rom &rom) {
     mos6502.set_carry(true);
+
+    mos6502.pc += addr_mode_to_bytes(Adress_modes::implied);
 }
 
 //Sets the decimal flag
 void Opcodes::SED(Mos6502 &mos6502, Rom &rom) {
     mos6502.set_decimal(true);
+
+    mos6502.pc += addr_mode_to_bytes(Adress_modes::implied);
 }
 
 //TODO:implement delay
 //Sets the interrupt flag
 void Opcodes::SEI(Mos6502 &mos6502, Rom &rom) {
     mos6502.set_interrupt(true);
+
+    mos6502.pc += addr_mode_to_bytes(Adress_modes::implied);
 }
 
 //Comparisions instructions
@@ -427,6 +502,8 @@ void Opcodes::CMP(Mos6502 &mos6502, Rom &rom, Adress_modes mode) {
     mos6502.set_zero(value==mos6502.ac);
     mos6502.set_carry(mos6502.ac>=value);
     mos6502.set_negative(result & 0x80);
+
+    mos6502.pc += addr_mode_to_bytes(mode);
 }
 
 //Compare with the X register
@@ -437,6 +514,8 @@ void Opcodes::CPX(Mos6502 &mos6502, Rom &rom, Adress_modes mode) {
     mos6502.set_zero(value==mos6502.x);
     mos6502.set_carry(mos6502.x>=value);
     mos6502.set_negative(result & 0x80);
+
+    mos6502.pc += addr_mode_to_bytes(mode);
 }
 
 //Compare with the Y register
@@ -447,6 +526,8 @@ void Opcodes::CPY(Mos6502 &mos6502, Rom &rom, Adress_modes mode) {
     mos6502.set_zero(value==mos6502.y);
     mos6502.set_carry(mos6502.y>=value);
     mos6502.set_negative(result & 0x80);
+
+    mos6502.pc += addr_mode_to_bytes(mode);
 }
 
 //Bit test instruction
@@ -459,6 +540,8 @@ void Opcodes::BIT(Mos6502 &mos6502, Rom &rom, Adress_modes mode) {
     mos6502.set_zero(result==0);
     mos6502.set_negative(value>>7);
     mos6502.set_overflow(value & 0x40);
+
+    mos6502.pc += addr_mode_to_bytes(mode);
 }
 
 
@@ -584,5 +667,5 @@ void Opcodes::RTI(Mos6502 &mos6502, Rom &rom) {
 
 //Other instruction
 void Opcodes::NOP(Mos6502 &mos6502, Rom &rom) {
-    return;
+    mos6502.pc += addr_mode_to_bytes(Adress_modes::implied);
 }

@@ -45,7 +45,7 @@ inline int addr_mode_to_bytes(Adress_modes mode) {
         break;
     
     case Adress_modes::indirect:
-        return 2;
+        return 3;
         break;
     
     case Adress_modes::x_indirect:
