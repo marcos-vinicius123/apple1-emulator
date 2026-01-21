@@ -460,3 +460,129 @@ void Opcodes::BIT(Mos6502 &mos6502, Rom &rom, Adress_modes mode) {
     mos6502.set_negative(value>>7);
     mos6502.set_overflow(value & 0x40);
 }
+
+
+//Conditional branch instructions
+
+//Branch on carry clear
+void Opcodes::BCC(Mos6502 &mos6502, Rom &rom) {
+    int8_t offset = get_value(mos6502, rom, Adress_modes::immediate);
+
+    mos6502.pc += 2; 
+    mos6502.pc += offset * !mos6502.get_carry();
+}
+
+//Branch on carry set
+void Opcodes::BCS(Mos6502 &mos6502, Rom &rom) {
+    int8_t offset = get_value(mos6502, rom, Adress_modes::immediate);
+
+    mos6502.pc += 2; 
+    mos6502.pc += offset * mos6502.get_carry();
+}
+
+//Branch on zero set
+void Opcodes::BEQ(Mos6502 &mos6502, Rom &rom) {
+    int8_t offset = get_value(mos6502, rom, Adress_modes::immediate);
+
+    mos6502.pc += 2; 
+    mos6502.pc += offset * mos6502.get_zero();
+}
+
+//Branch on negative set
+void Opcodes::BMI(Mos6502 &mos6502, Rom &rom) {
+    int8_t offset = get_value(mos6502, rom, Adress_modes::immediate);
+
+    mos6502.pc += 2; 
+    mos6502.pc += offset * mos6502.get_negative();
+}
+//Branch on zero clear
+void Opcodes::BNE(Mos6502 &mos6502, Rom &rom) {
+    int8_t offset = get_value(mos6502, rom, Adress_modes::immediate);
+
+    mos6502.pc += 2; 
+    mos6502.pc += offset * !mos6502.get_zero();
+}
+
+//Branch on negative clear
+void Opcodes::BPL(Mos6502 &mos6502, Rom &rom) {
+    int8_t offset = get_value(mos6502, rom, Adress_modes::immediate);
+
+    mos6502.pc += 2; 
+    mos6502.pc += offset * !mos6502.get_negative();
+}
+
+//Branch on overflow clear
+void Opcodes::BVC(Mos6502 &mos6502, Rom &rom) {
+    int8_t offset = get_value(mos6502, rom, Adress_modes::immediate);
+
+    mos6502.pc += 2; 
+    mos6502.pc += offset * !mos6502.get_overflow();
+}
+
+//Branch on overflow set
+void Opcodes::BVS(Mos6502 &mos6502, Rom &rom) {
+    int8_t offset = get_value(mos6502, rom, Adress_modes::immediate);
+
+    mos6502.pc += 2; 
+    mos6502.pc += offset * mos6502.get_overflow();
+}
+
+//Jumps and subroutines instructions
+
+//Jump
+void Opcodes::JMP(Mos6502 &mos6502, Rom &rom, Adress_modes mode) {
+     uint16_t address = get_adress(mos6502, rom, Adress_modes::absolute);
+
+     if (mode==Adress_modes::indirect) {
+        uint8_t low = rom.read(address);
+        uint8_t high = rom.read((address & 0xff00) | ((address+1) & 0x00ff));
+        address = (high << 8) | low;
+     }
+
+     mos6502.pc = address;
+}
+
+//Jump subroutine
+void Opcodes::JSR(Mos6502 &mos6502, Rom &rom) {
+    uint16_t return_addr = mos6502.pc+2;
+    uint16_t sub_addr = get_adress(mos6502, rom, Adress_modes::absolute);
+
+    rom.push(mos6502, return_addr>>8);
+    rom.push(mos6502, return_addr&0x00ff);
+
+    mos6502.pc = sub_addr;
+}
+
+//Return from subroutine
+void Opcodes::RTS(Mos6502 &mos6502, Rom &rom) {
+    uint8_t low = rom.pull(mos6502);
+    uint8_t high = rom.pull(mos6502);
+    
+    mos6502.pc = ((high << 8) | low) + 1;
+}
+
+//Interrupts instructions
+
+//Break / software interrupt
+void Opcodes::BRK(Mos6502 &mos6502, Rom &rom) {
+    mos6502.pc += 2;
+    rom.push(mos6502, mos6502.pc>>8);
+    rom.push(mos6502, mos6502.pc&0x00ff);
+    rom.push(mos6502, mos6502.sr.to_byte() | 0b00110000);
+
+    mos6502.set_interrupt(true);
+    mos6502.pc = rom.read_address(0xfffe); //new program counter from the IRQ vector
+}
+
+//Return from interrupt
+void Opcodes::RTI(Mos6502 &mos6502, Rom &rom) {
+    mos6502.sr.from_byte(rom.pull(mos6502));
+    mos6502.set_break(false);
+    mos6502.set_unused(true);
+    mos6502.pc = rom.pull(mos6502) | (rom.pull(mos6502)<<8);
+}
+
+//Other instruction
+void Opcodes::NOP(Mos6502 &mos6502, Rom &rom) {
+    return;
+}

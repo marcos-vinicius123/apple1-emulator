@@ -8,9 +8,11 @@ class Rom;
 class Mos6502 {
     public:
         void step(Rom &rom);
+        void reset(Rom &rom);
 
         void set_negative(bool value);
         void set_overflow(bool value);
+        void set_unused(bool value);
         void set_break(bool value);
         void set_decimal(bool value);
         void set_interrupt(bool value);
@@ -19,6 +21,7 @@ class Mos6502 {
 
         bool get_negative();
         bool get_overflow();
+        bool get_unused();
         bool get_break();
         bool get_decimal();
         bool get_interrupt();

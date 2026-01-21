@@ -9,12 +9,22 @@ void Mos6502::step(Rom &rom) {
 
     switch (opcode) {
         case 0x0:
-            /* code */
+            
             break;
         
         default:
             break;
     }
+}
+
+void Mos6502::reset(Rom &rom) {
+    pc = rom.read_address(0xfffc);
+    sp = 0xfd;
+    set_interrupt(true);
+    set_decimal(false);
+    set_break(false);
+
+    ac = x = y = 0;
 }
 
 void Mos6502::set_negative(bool value) {
@@ -23,6 +33,10 @@ void Mos6502::set_negative(bool value) {
 
 void Mos6502::set_overflow(bool value) {
     sr.overflow = value;
+}
+
+void Mos6502::set_unused(bool value) {
+    sr.unused = value;
 }
 
 void Mos6502::set_break(bool value) {
@@ -52,9 +66,15 @@ bool Mos6502::get_negative() {
 bool Mos6502::get_overflow() {
     return sr.overflow;
 }
+
+bool Mos6502::get_unused() {
+    return sr.unused;
+}
+
 bool Mos6502::get_break() {
     return sr.break_;
 }
+
 bool Mos6502::get_decimal() {
     return sr.decimal;
 }
