@@ -11,4 +11,9 @@ include_directories(
     ${PROJECT_SOURCE_DIR}/src
 )
 
+find_package(Curses REQUIRED)
+
 add_executable(emulator ${all_SRCS})
+
+target_include_directories(emulator PRIVATE  ${CURSES_INCLUDE_DIR})
+target_link_libraries(emulator PRIVATE ${CURSES_LIBRARIES})
