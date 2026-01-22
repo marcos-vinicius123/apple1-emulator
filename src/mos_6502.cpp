@@ -1,4 +1,5 @@
 #include <cstdint>
+#include <cstdio>
 #include "mos_6502.h"
 #include "rom.h"
 #include "adress_modes.h"
@@ -7,6 +8,8 @@
 void Mos6502::step(Rom &rom) {
     uint8_t opcode = rom.read(pc);
     Opcodes opcodes;
+
+    // printf("PC: 0x%04X  OPCODE: 0x%02X\n", pc, rom.read(pc));
 
     switch (opcode) {
         case 0x00:

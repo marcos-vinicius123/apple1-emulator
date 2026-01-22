@@ -238,10 +238,11 @@ void Opcodes::PLP(Mos6502  &mos6502, Rom &rom) {
 //Decrements ROM
 void Opcodes::DEC(Mos6502 &mos6502, Rom &rom, Adress_modes mode) {
     uint16_t addr = get_adress(mos6502, rom, mode);
-    rom.write(addr, rom.read(addr)-1);
+    uint8_t value = rom.read(addr) - 1;
+    rom.write(addr, value);
 
-    mos6502.set_negative(rom.read(addr)>>7);
-    mos6502.set_zero(rom.read(addr)==0);
+    mos6502.set_negative(value>>7);
+    mos6502.set_zero(value==0);
 
     mos6502.pc += addr_mode_to_bytes(mode);
 }
@@ -269,10 +270,11 @@ void Opcodes::DEY(Mos6502 &mos6502, Rom &rom) {
 //Increments ROM
 void Opcodes::INC(Mos6502 &mos6502, Rom &rom, Adress_modes mode) {
     uint16_t addr = get_adress(mos6502, rom, mode);
-    rom.write(addr, rom.read(addr)+1);
+    uint8_t value = rom.read(addr) + 1;
+    rom.write(addr, value);
 
-    mos6502.set_negative(rom.read(addr)>>7);
-    mos6502.set_zero(rom.read(addr)==0);
+    mos6502.set_negative(value>>7);
+    mos6502.set_zero(value==0);
 
     mos6502.pc += addr_mode_to_bytes(mode);
 }
