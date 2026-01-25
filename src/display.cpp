@@ -1,17 +1,28 @@
 #include "device.h"
 #include <ncurses.h>
 
-class Display : Device {
+class Display : public Device {
     private:
         void display_char(uint8_t value) {
 
             //prepare value
-            addch(value);
-            line_count++;
-            if (line_count==40) {
-                addch('\n');
-                line_count = 0;
+            value &= 0x7f;
+            if (value==0x0d) {
+                int y, x;
+                getyx(stdscr, y, x);
+                move(y + 1, 0);
+            } else if (value>=0x20 and value <= 0x5f) {
+                addch(value);
             }
+            // else {
+            //     addch(' ');
+            // }
+            refresh();
+            // line_count++;
+            // if (line_count==40) {
+            //     addch('\n');
+            //     line_count = 0;
+            // }
         }
 
         int line_count = 0;
@@ -20,13 +31,18 @@ class Display : Device {
     
     public:
         uint8_t read(uint16_t addr) override {
-
+            if (addr==0xd012) {
+                return 0;
+            } else {
+                return ready ? 0x80 : 0;
+            }
         }
 
         void write(uint16_t addr, uint8_t value) override {
-            if (addr==0xd012) {
+            if (addr==0xd012 and ready) {
                 display_char(value);
                 ready = false;
+                timer = 2;
             }
         }
 
@@ -35,6 +51,11 @@ class Display : Device {
         }
 
         void update() override {
-
+            if (timer) {
+                timer--;
+                if (timer==0) {
+                    ready = true;
+                }
+            }
         }
 };

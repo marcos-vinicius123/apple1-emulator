@@ -18,6 +18,6 @@ elif command -v kitty >/dev/null 2>&1; then
 elif command -v xterm >/dev/null 2>&1; then
     xterm -e "$EMU"
 else
-    echo "No supported terminal emulator found."`
+    echo "No supported terminal emulator found."
     exit 1
 fi
