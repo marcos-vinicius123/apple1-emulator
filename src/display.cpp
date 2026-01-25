@@ -42,7 +42,7 @@ class Display : public Device {
             if (addr==0xd012 and ready) {
                 display_char(value);
                 ready = false;
-                timer = 2;
+                timer = 1;
             }
         }
 

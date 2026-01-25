@@ -3,6 +3,7 @@
 #include "mos_6502.h"
 #include "rom.h"
 #include "display.cpp"
+#include "keyboard.cpp"
 #include "device_manager.h"
 
 int main(int, char**){
@@ -20,12 +21,12 @@ int main(int, char**){
     mos6502.reset(rom);
 
     Display display;
+    Keyboard keyboard;
     device_manager.add_device(&display);
+    device_manager.add_device(&keyboard);
 
-    int ch;
-    while (ch!=KEY_BACKSPACE) {
+    while (!keyboard.stop) {
         mos6502.step(rom);
-        ch = getch();
         device_manager.update_devices();
         napms(10);
         // if (std::cin.get()=='q') {
