@@ -9,9 +9,6 @@ int main(int, char**){
     cbreak();
     nodelay(stdscr, TRUE);   // non-blocking input
     keypad(stdscr, TRUE);
-
-    printw(std::filesystem::current_path().c_str());
-    refresh();
     
     Mos6502 mos6502 = Mos6502();
     Rom rom = Rom();

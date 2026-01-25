@@ -26,4 +26,10 @@ void DeviceManager::add_device(Device *device) {
     devices.push_back(device);
 }
 
+void DeviceManager::update_devices() {
+    for (auto dev : devices) {
+        dev->update();
+    }
+}
+
 DeviceManager device_manager;
