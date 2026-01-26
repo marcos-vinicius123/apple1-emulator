@@ -30,14 +30,14 @@ class Display : public Device {
     public:
         uint8_t read(uint16_t addr) override {
             if (addr==0xd012) {
-                return  0x40;
+                return ready ? 0x0 : 0x80;
             } else {
-                return ready ? 0x80 : 0;
+                return ready ? 0x0 : 0x80;
             }
         }
 
         void write(uint16_t addr, uint8_t value) override {
-            if (addr==0xd012) {
+            if (addr==0xd012 and ready) {
                 display_char(value);
                 ready = false;
                 timer = 2;

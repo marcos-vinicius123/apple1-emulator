@@ -13,6 +13,7 @@ int main(int, char**){
     cbreak();
     nodelay(stdscr, TRUE);   // non-blocking input
     keypad(stdscr, TRUE);
+    scrollok(stdscr, FALSE);
     scrollok(stdscr, TRUE);
     mousemask(0, nullptr);
     mouseinterval(0);

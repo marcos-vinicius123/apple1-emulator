@@ -36,9 +36,9 @@ class Keyboard : public Device {
                     ch = character-'a'+'A';
                 } else if (character == KEY_ENTER or character == '\n') {
                     ch = 0x0d;
-                } else if (character==KEY_BACKSPACE){
+                }else if (character == KEY_BACKSPACE) {
                     stop = true;
-                }else {
+                } else {
                     ch = character;
                 }
                 has_key = true;
