@@ -8,9 +8,7 @@ class Display : public Device {
             //prepare value
             value &= 0x7f;
             if (value==0x0d) {
-                int y, x;
-                getyx(stdscr, y, x);
-                move(y + 1, 0);
+                addch('\n');
             } else if (value>=0x20 and value <= 0x5f) {
                 addch(value);
             }
@@ -32,17 +30,17 @@ class Display : public Device {
     public:
         uint8_t read(uint16_t addr) override {
             if (addr==0xd012) {
-                return 0;
+                return  0x40;
             } else {
                 return ready ? 0x80 : 0;
             }
         }
 
         void write(uint16_t addr, uint8_t value) override {
-            if (addr==0xd012 and ready) {
+            if (addr==0xd012) {
                 display_char(value);
                 ready = false;
-                timer = 1;
+                timer = 2;
             }
         }
 

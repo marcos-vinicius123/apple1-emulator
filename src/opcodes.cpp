@@ -302,30 +302,57 @@ void Opcodes::INY(Mos6502 &mos6502, Rom &rom) {
 
 //Arithmetic instructions
 
-//TODO: Implement decimal mode support in both the ADC and SBC instructions
 //Add with carry  
 void Opcodes::ADC(Mos6502 &mos6502, Rom &rom, Adress_modes mode) {
     uint8_t value = get_value(mos6502, rom, mode);
     uint16_t sum = mos6502.ac + value + mos6502.get_carry();
-    mos6502.set_carry(sum>0xff);
+
     mos6502.set_overflow(~(mos6502.ac ^ value) & (mos6502.ac ^ sum) & 0x80);
+
+    if (mos6502.get_decimal()) {
+        if (((mos6502.ac & 0x0f) + (value & 0x0f) + mos6502.get_carry())>9) {
+            sum += 0x06;
+        }
+        if (sum>0x99) {
+            sum += 0x60;
+        }
+    }
+    mos6502.set_carry(sum>0xff);
     mos6502.ac = sum & 0xff;
     mos6502.set_zero(mos6502.ac==0);
     mos6502.set_negative(mos6502.ac>>7);
-
+    
     mos6502.pc += addr_mode_to_bytes(mode);
 }
 
 //Subtract with carry
 void Opcodes::SBC(Mos6502 &mos6502, Rom &rom, Adress_modes mode) {
-    uint8_t value = ~get_value(mos6502, rom, mode);
-    uint16_t sum = mos6502.ac + value + mos6502.get_carry();
-    mos6502.set_carry(sum>0xff);
-    mos6502.set_overflow(~(mos6502.ac ^ value) & (mos6502.ac ^ sum) & 0x80);
-    mos6502.ac = sum & 0xff;
-    mos6502.set_zero(mos6502.ac==0);
-    mos6502.set_negative(mos6502.ac>>7);
+    uint8_t value = get_value(mos6502, rom, mode);
+    int16_t sum = mos6502.ac - value - (1-mos6502.get_carry());
+    
+    if (mos6502.get_decimal()) {
+        
+        mos6502.set_overflow(((mos6502.ac ^ sum) & (mos6502.ac ^ value)) & 0x80);
 
+        if (((mos6502.ac&0x0f)-(value&0x0f)-(1-mos6502.get_carry()))<0) {
+            sum -= 0x06;
+        }
+        if (sum<0) {
+            sum -= 0x60;
+        }
+
+        mos6502.set_carry(sum>=0);
+        mos6502.ac = sum & 0xff;
+        mos6502.set_zero(mos6502.ac==0);
+        mos6502.set_negative(mos6502.ac>>7);
+    } else {
+        
+        mos6502.set_carry(sum<0x100);
+        mos6502.set_overflow(((mos6502.ac^sum)&(mos6502.ac^value))&0x80);
+        mos6502.ac = sum & 0xff;
+        mos6502.set_zero(mos6502.ac==0);
+        mos6502.set_negative(mos6502.ac>>7);
+    }
     mos6502.pc += addr_mode_to_bytes(mode);
 }
 
