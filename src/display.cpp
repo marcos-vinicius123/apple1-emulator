@@ -1,8 +1,13 @@
 #include "device.h"
 #include <ncurses.h>
+#include <chrono>
 
 class Display : public Device {
     private:
+        bool is_ready() {
+            return std::chrono::duration_cast<std::chrono::milliseconds>(clock::now() - timer).count()>16;
+        }
+
         void display_char(uint8_t value) {
 
             //prepare value
@@ -22,25 +27,22 @@ class Display : public Device {
             //     line_count = 0;
             // }
         }
-
-        int line_count = 0;
-        bool ready = true;
-        int timer = 0;
+        using clock = std::chrono::steady_clock;
+        clock::time_point timer = clock::now();
     
     public:
         uint8_t read(uint16_t addr) override {
             if (addr==0xd012) {
-                return ready ? 0x0 : 0x80;
+                return is_ready() ? 0x0 : 0x80;
             } else {
-                return ready ? 0x0 : 0x80;
+                return is_ready() ? 0x0 : 0x80;
             }
         }
 
         void write(uint16_t addr, uint8_t value) override {
-            if (addr==0xd012 and ready) {
+            if (addr==0xd012 and is_ready()) {
                 display_char(value);
-                ready = false;
-                timer = 2;
+                timer = clock::now();
             }
         }
 
@@ -48,12 +50,4 @@ class Display : public Device {
             return (addr==0xd012 or addr==0xd013);
         }
 
-        void update() override {
-            if (timer) {
-                timer--;
-                if (timer==0) {
-                    ready = true;
-                }
-            }
-        }
 };

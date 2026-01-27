@@ -306,26 +306,77 @@ void Opcodes::INY(Mos6502 &mos6502, Rom &rom) {
 //Add with carry  
 void Opcodes::ADC(Mos6502 &mos6502, Rom &rom, Adress_modes mode) {
     uint8_t value = get_value(mos6502, rom, mode);
-    uint16_t sum = mos6502.ac + value + mos6502.get_carry();
-    mos6502.set_carry(sum>0xff);
-    mos6502.set_overflow(~(mos6502.ac ^ value) & (mos6502.ac ^ sum) & 0x80);
-    mos6502.ac = sum & 0xff;
-    mos6502.set_zero(mos6502.ac==0);
-    mos6502.set_negative(mos6502.ac>>7);
+    uint16_t sum;
 
+    if (mos6502.get_decimal()) {
+        // BCD mode addition
+        uint8_t al = (mos6502.ac & 0x0F) + (value & 0x0F) + mos6502.get_carry();
+        uint8_t ah = (mos6502.ac >> 4) + (value >> 4);
+        
+        if (al > 9) {
+            al -= 10;
+            ah += 1;
+        }
+
+        if (ah > 9) {
+            mos6502.set_carry(true);
+            ah -= 10;
+        } else {
+            mos6502.set_carry(false);
+        }
+
+        sum = (ah << 4) | (al & 0x0F);
+
+        mos6502.set_overflow(((mos6502.ac ^ sum) & (value ^ sum) & 0x80) != 0);
+    } else {
+        // Binary mode
+        sum = mos6502.ac + value + mos6502.get_carry();
+        mos6502.set_carry(sum > 0xFF);
+        mos6502.set_overflow((~(mos6502.ac ^ value) & (mos6502.ac ^ sum) & 0x80) != 0);
+    }
+
+    mos6502.ac = sum & 0xFF;
+    mos6502.set_zero(mos6502.ac == 0);
+    mos6502.set_negative(mos6502.ac >> 7);
     mos6502.pc += addr_mode_to_bytes(mode);
 }
 
 //Subtract with carry
 void Opcodes::SBC(Mos6502 &mos6502, Rom &rom, Adress_modes mode) {
-    uint8_t value = ~get_value(mos6502, rom, mode);
-    uint16_t sum = mos6502.ac + value + mos6502.get_carry();
-    mos6502.set_carry(sum>0xff);
-    mos6502.set_overflow(~(mos6502.ac ^ value) & (mos6502.ac ^ sum) & 0x80);
-    mos6502.ac = sum & 0xff;
-    mos6502.set_zero(mos6502.ac==0);
-    mos6502.set_negative(mos6502.ac>>7);
+    uint8_t value = get_value(mos6502, rom, mode) ^ 0xFF; // invert for SBC
+    uint16_t sum;
 
+    if (mos6502.get_decimal()) {
+        // BCD mode subtraction
+        uint8_t al = (mos6502.ac & 0x0F) + (value & 0x0F) + mos6502.get_carry();
+        uint8_t ah = (mos6502.ac >> 4) + (value >> 4);
+
+        if (al > 9) {
+            al -= 10;
+            ah += 1;
+        }
+
+        if (ah > 9) {
+            mos6502.set_carry(false);
+            ah -= 10;
+        } else {
+            mos6502.set_carry(true);
+        }
+
+        sum = (ah << 4) | (al & 0x0F);
+
+        // Overflow is calculated like the 6502
+        mos6502.set_overflow(((mos6502.ac ^ sum) & (value ^ sum) & 0x80) != 0);
+    } else {
+        // Binary mode
+        sum = mos6502.ac + value + mos6502.get_carry();
+        mos6502.set_carry(sum > 0xFF);
+        mos6502.set_overflow((~(mos6502.ac ^ value) & (mos6502.ac ^ sum) & 0x80) != 0);
+    }
+
+    mos6502.ac = sum & 0xFF;
+    mos6502.set_zero(mos6502.ac == 0);
+    mos6502.set_negative(mos6502.ac >> 7);
     mos6502.pc += addr_mode_to_bytes(mode);
 }
 

@@ -21,6 +21,7 @@ int main(int, char**){
     Mos6502 mos6502 = Mos6502();
     Rom rom = Rom();
     rom.load_file("roms/wozmon.bin", 0xff00);
+    rom.load_file("roms/replica1.bin", 0xe000);
     mos6502.reset(rom);
 
     Display display;
@@ -29,7 +30,9 @@ int main(int, char**){
     device_manager.add_device(&keyboard);
 
     while (!keyboard.stop) {
-        mos6502.step(rom);
+        for (int i=0; i<1000; i++) {
+            mos6502.step(rom);
+        }
         device_manager.update_devices();
         napms(10);
         // if (std::cin.get()=='q') {
